@@ -12,7 +12,6 @@
             --accent-purple: #6a0dad;
             --locked: #333;
             --border: #2a2a2a;
-            --glow: 0 0 10px rgba(106, 13, 173, 0.5);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; cursor: crosshair; }
@@ -29,15 +28,15 @@
         .hidden { display: none !important; }
         .locked { color: var(--locked); opacity: 0.5; }
         
-        /* Obvious Clickable Highlight */
         .clickable { 
             color: #fff;
             text-shadow: 0 0 5px var(--accent-purple);
             border: 1px solid var(--accent-purple);
             background: rgba(106, 13, 173, 0.1);
             animation: pulse 2s infinite;
-            padding: 2px 5px;
+            padding: 5px 10px;
             transition: 0.3s;
+            display: inline-block;
         }
 
         .clickable:hover {
@@ -53,7 +52,7 @@
             100% { box-shadow: 0 0 5px rgba(106, 13, 173, 0.4); }
         }
 
-        /* --- REVAMPED INTRO SCREEN --- */
+        /* --- INTRO SCREEN --- */
         #intro-screen {
             display: flex;
             justify-content: center;
@@ -67,7 +66,6 @@
             padding: 20px;
             border: 1px solid var(--accent-red);
             background: #0a0000;
-            box-shadow: 0 0 20px rgba(179, 0, 0, 0.2);
         }
 
         .terminal-line {
@@ -80,12 +78,13 @@
             width: 0;
         }
 
-        /* --- PAGE 1: CONTROL PANEL --- */
-        #main-panel {
+        /* --- PAGE LAYOUTS --- */
+        .page {
             padding: 40px;
             height: 100vh;
             border: 2px solid var(--border);
             margin: 10px;
+            overflow-y: auto;
         }
 
         .header {
@@ -103,17 +102,11 @@
         .section-box {
             padding: 20px;
             border: 1px solid var(--border);
-            font-weight: bold;
         }
 
-        /* --- PAGE 2: SCROLLABLE TASK FORCE LIST --- */
-        #mtf-list-page {
-            padding: 40px;
-            height: 100vh;
-        }
-
+        /* --- SCROLLABLE REGISTRY --- */
         .mtf-scroll-container {
-            height: 70vh;
+            height: 65vh;
             overflow-y: scroll;
             border: 1px solid var(--border);
             padding: 20px;
@@ -121,9 +114,7 @@
             margin-bottom: 20px;
         }
 
-        /* Scrollbar Styling */
         .mtf-scroll-container::-webkit-scrollbar { width: 6px; }
-        .mtf-scroll-container::-webkit-scrollbar-track { background: #000; }
         .mtf-scroll-container::-webkit-scrollbar-thumb { background: var(--accent-purple); }
 
         .mtf-entry {
@@ -133,7 +124,26 @@
             color: #888;
         }
 
-        /* --- PAGE 3: DOSSIER --- */
+        /* --- MODAL --- */
+        #modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .modal {
+            background: #111;
+            padding: 40px;
+            border: 1px solid var(--accent-red);
+            text-align: center;
+            max-width: 450px;
+        }
+
+        /* --- DOSSIER --- */
         .dossier-header {
             display: flex;
             gap: 30px;
@@ -144,11 +154,10 @@
 
         .content-section { margin-bottom: 25px; border-top: 1px solid var(--border); padding-top: 15px; }
 
-        /* --- TYPING ANIMATIONS --- */
+        /* --- TYPING --- */
         .t1 { animation: type 1s steps(30) forwards; }
         .t2 { animation: type 1s steps(30) 1s forwards; }
         .t3 { animation: type 1s steps(30) 2s forwards; }
-
         @keyframes type { from { width: 0; } to { width: 100%; } }
     </style>
 </head>
@@ -162,10 +171,10 @@
         </div>
     </div>
 
-    <div id="main-panel" class="hidden">
+    <div id="main-panel" class="page hidden">
         <div class="header">
             <h1>FOUNDATIONAL INFORMATION CONTROL</h1>
-            <p style="font-size: 0.8rem; color: var(--accent-purple);">ENCRYPTION: ACTIVE | SYSTEM: STABLE</p>
+            <p style="font-size: 0.8rem; color: var(--accent-purple);">STATUS: ENCRYPTED ACCESS</p>
         </div>
         <div class="grid-container">
             <div class="section-box locked">COMMAND [CL: IV+ | LOCKED]</div>
@@ -178,7 +187,7 @@
         </div>
     </div>
 
-    <div id="mtf-list-page" class="hidden">
+    <div id="mtf-list-page" class="page hidden">
         <h2 style="color: var(--accent-red); margin-bottom: 10px;">FOUNDATION MTF REGISTRY</h2>
         <div class="mtf-scroll-container">
             <div class="mtf-entry">MTF █████-█ (“███ █████ ████”)</div>
@@ -294,10 +303,19 @@
             <div class="mtf-entry">DTF Sigma-6 (“Puddlejumpers”)</div>
             <div class="mtf-entry">STF Rho-7 (“Greeting Party”)</div>
         </div>
-        <div class="clickable" style="display: inline-block;" onclick="showPage('main-panel')">RETURN TO HUB</div>
+        <div class="clickable" onclick="showPage('main-panel')">RETURN TO HUB</div>
     </div>
 
-    <div id="xi3-dossier" class="hidden" style="padding: 40px; overflow-y: auto; height: 100vh;">
+    <div id="modal-overlay" class="hidden">
+        <div class="modal">
+            <h2 style="color: var(--accent-red); margin-bottom: 15px;">SECURITY LOCK</h2>
+            <p style="margin-bottom: 25px; line-height: 1.5;">THIS FILE IS CLEARANCE LEVEL II LOCKED.<br>WOULD YOU LIKE TO PROCEED?</p>
+            <div class="clickable" onclick="startLoadingRedirect()" style="margin-right: 15px;">YES</div>
+            <div class="clickable" style="background: #222;" onclick="closeModal()">NO</div>
+        </div>
+    </div>
+
+    <div id="xi3-dossier" class="page hidden">
         <div class="dossier-header">
             <div style="width:120px; height:120px; border:1px solid #fff; display:flex; align-items:center; text-align:center; font-size:10px;">[IMAGE: LOGO_XI3]</div>
             <div>
@@ -305,42 +323,66 @@
                 <p>DOE: 03/02/1971 | OVERSIGHT: "Morpheus"</p>
                 <p>CO-OVERSIGHT: "Emperyan"</p>
                 <p>SECTION: SPECIALIZED RECONTAINMENT</p>
+                <p>SUB-SECTION: ANOMALOUS PERSONNEL</p>
             </div>
         </div>
         
         <div class="content-section">
-            <h3>CREATION (LORE)</h3>
+            <h3 style="color: var(--accent-purple);">CREATION (LORE)</h3>
             <p>[ENTER LORE HERE]</p>
         </div>
 
         <div class="content-section">
-            <h3>FOLLOW UP</h3>
+            <h3 style="color: var(--accent-purple);">FOLLOW UP</h3>
             <p>[ENTER FOLLOW UP DATA HERE]</p>
         </div>
 
-        <div class="clickable" style="margin-top: 20px; padding: 15px; text-align: center;" onclick="alert('Accessing Action Report #001...')">
+        <div class="clickable" style="width: 100%; text-align: center; margin-top: 30px;" onclick="showPage('action-report')">
             [ACCESS] ACTION REPORT #001
         </div>
     </div>
 
+    <div id="action-report" class="page hidden">
+        <h1 style="color: var(--accent-red); text-align: center;">ACTION REPORT #001</h1>
+        <hr style="border: 1px solid var(--accent-purple); margin: 20px 0;">
+        <div style="max-width: 800px; margin: auto; line-height: 1.8;">
+            <p><strong>REPORT STATUS:</strong> CLASSIFIED</p>
+            <p>[CONTENT TO BE EDITED IN CODE]</p>
+            <br>
+            <div class="clickable" onclick="showPage('xi3-dossier')">BACK TO DOSSIER</div>
+        </div>
+    </div>
+
     <script>
-        // Intro handling
+        // Start sequence
         setTimeout(() => {
             document.getElementById('intro-screen').classList.add('hidden');
             document.getElementById('main-panel').classList.remove('hidden');
-        }, 4000);
+        }, 3500);
 
         function showPage(p) {
-            document.getElementById('main-panel').classList.add('hidden');
-            document.getElementById('mtf-list-page').classList.add('hidden');
-            document.getElementById('xi3-dossier').classList.add('hidden');
+            // Hide everything
+            const pages = ['main-panel', 'mtf-list-page', 'xi3-dossier', 'action-report'];
+            pages.forEach(id => document.getElementById(id).classList.add('hidden'));
+            // Show selection
             document.getElementById(p).classList.remove('hidden');
         }
 
         function triggerXi3Prompt() {
-            if(confirm("THIS FILE IS CLEARANCE LEVEL II LOCKED, WOULD YOU LIKE TO PROCEED?")) {
+            document.getElementById('modal-overlay').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('modal-overlay').classList.add('hidden');
+        }
+
+        function startLoadingRedirect() {
+            const modal = document.querySelector('.modal');
+            modal.innerHTML = `<h2 style="color: var(--accent-purple);">DECRYPTING...</h2><p>ACCESSING SECURE DATABASE...</p>`;
+            setTimeout(() => {
+                closeModal();
                 showPage('xi3-dossier');
-            }
+            }, 2000);
         }
     </script>
 </body>
