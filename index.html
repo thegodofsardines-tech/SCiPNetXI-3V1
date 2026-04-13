@@ -6,13 +6,13 @@
     <title>SCiPNet | Intelligence Database</title>
     <style>
         :root {
-            --bg-color: #0a0a0a;
-            --text-main: #e0e0e0;
-            --accent-red: #8b0000;
-            --accent-purple: #4b0082;
-            --locked: #555;
-            --border: #333;
-            --glitch-speed: 0.3s;
+            --bg-color: #050505;
+            --text-main: #d4d4d4;
+            --accent-red: #b30000;
+            --accent-purple: #6a0dad;
+            --locked: #333;
+            --border: #2a2a2a;
+            --glow: 0 0 10px rgba(106, 13, 173, 0.5);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; cursor: crosshair; }
@@ -27,161 +27,145 @@
 
         /* --- UTILITIES --- */
         .hidden { display: none !important; }
-        .locked { color: var(--locked); pointer-events: none; }
-        .clickable { color: var(--text-main); border-bottom: 1px solid transparent; transition: 0.3s; }
-        .clickable:hover { color: var(--accent-red); border-bottom: 1px solid var(--accent-red); cursor: pointer; }
+        .locked { color: var(--locked); opacity: 0.5; }
+        
+        /* Obvious Clickable Highlight */
+        .clickable { 
+            color: #fff;
+            text-shadow: 0 0 5px var(--accent-purple);
+            border: 1px solid var(--accent-purple);
+            background: rgba(106, 13, 173, 0.1);
+            animation: pulse 2s infinite;
+            padding: 2px 5px;
+            transition: 0.3s;
+        }
 
-        /* --- INTRO ANIMATION --- */
+        .clickable:hover {
+            background: var(--accent-red);
+            color: white;
+            text-shadow: 0 0 10px white;
+            border-color: white;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 5px rgba(106, 13, 173, 0.4); }
+            50% { box-shadow: 0 0 15px rgba(179, 0, 0, 0.6); }
+            100% { box-shadow: 0 0 5px rgba(106, 13, 173, 0.4); }
+        }
+
+        /* --- REVAMPED INTRO SCREEN --- */
         #intro-screen {
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background: black;
-            z-index: 1000;
+            background: #000;
         }
 
-        .terminal-text {
-            width: 0;
+        .terminal-box {
+            width: 500px;
+            padding: 20px;
+            border: 1px solid var(--accent-red);
+            background: #0a0000;
+            box-shadow: 0 0 20px rgba(179, 0, 0, 0.2);
+        }
+
+        .terminal-line {
+            color: var(--accent-red);
+            font-size: 14px;
+            margin-bottom: 8px;
             overflow: hidden;
             white-space: nowrap;
-            border-right: .15em solid var(--accent-red);
-            animation: typing 3s steps(40, end) forwards, blink-caret .75s step-end infinite;
-            font-size: 1.2rem;
-            color: var(--accent-red);
+            border-right: 2px solid var(--accent-red);
+            width: 0;
         }
-
-        @keyframes typing { from { width: 0 } to { width: 100% } }
-        @keyframes blink-caret { from, to { border-color: transparent } 50% { border-color: var(--accent-red); } }
 
         /* --- PAGE 1: CONTROL PANEL --- */
         #main-panel {
             padding: 40px;
             height: 100vh;
-            border: 10px double var(--border);
+            border: 2px solid var(--border);
             margin: 10px;
-            background: linear-gradient(135deg, #0a0a0a 0%, #150015 100%);
         }
 
         .header {
-            border-bottom: 2px solid var(--accent-red);
-            padding-bottom: 10px;
-            margin-bottom: 30px;
-            display: flex;
-            justify-content: space-between;
+            border-bottom: 3px double var(--accent-red);
+            padding-bottom: 15px;
+            margin-bottom: 40px;
         }
 
         .grid-container {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
+            gap: 15px;
         }
 
         .section-box {
-            padding: 15px;
-            border: 1px solid var(--border);
-            background: rgba(255, 255, 255, 0.02);
-        }
-
-        /* --- PAGE 2: TASK FORCE LIST --- */
-        #mtf-list-page {
-            padding: 40px;
-            height: 100vh;
-            overflow-y: auto;
-        }
-
-        .mtf-entry {
-            padding: 10px;
-            border-bottom: 1px solid #222;
-            font-size: 0.9rem;
-        }
-
-        /* --- PAGE 3: XI-3 DOSSIER --- */
-        #xi3-dossier {
-            padding: 40px;
-            background: #0d0d0d;
-            height: 100vh;
-            overflow-y: auto;
-        }
-
-        .dossier-header {
-            display: flex;
-            gap: 30px;
-            margin-bottom: 40px;
-            border: 1px solid var(--accent-purple);
             padding: 20px;
-            background: rgba(75, 0, 130, 0.05);
-        }
-
-        .logo-placeholder {
-            width: 150px;
-            height: 150px;
-            border: 2px solid var(--accent-red);
-            display: flex;
-            align-items: center;
-            text-align: center;
-            font-size: 0.7rem;
-        }
-
-        .info-block h2 { color: var(--accent-red); margin-bottom: 10px; }
-        .content-section { margin-top: 30px; border-left: 3px solid var(--accent-purple); padding-left: 15px; }
-
-        /* --- POPUP / MODAL --- */
-        #modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-        }
-
-        .modal {
-            background: #1a1a1a;
-            padding: 30px;
-            border: 2px solid var(--accent-red);
-            text-align: center;
-        }
-
-        .btn {
-            background: var(--accent-red);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            margin: 10px;
-            font-family: 'Courier New';
+            border: 1px solid var(--border);
             font-weight: bold;
         }
 
-        .btn:hover { background: white; color: black; }
-
-        /* --- SCANLINE EFFECT --- */
-        body::before {
-            content: " ";
-            display: block;
-            position: absolute;
-            top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            z-index: 9999;
-            background-size: 100% 2px, 3px 100%;
-            pointer-events: none;
+        /* --- PAGE 2: SCROLLABLE TASK FORCE LIST --- */
+        #mtf-list-page {
+            padding: 40px;
+            height: 100vh;
         }
+
+        .mtf-scroll-container {
+            height: 70vh;
+            overflow-y: scroll;
+            border: 1px solid var(--border);
+            padding: 20px;
+            background: rgba(0,0,0,0.5);
+            margin-bottom: 20px;
+        }
+
+        /* Scrollbar Styling */
+        .mtf-scroll-container::-webkit-scrollbar { width: 6px; }
+        .mtf-scroll-container::-webkit-scrollbar-track { background: #000; }
+        .mtf-scroll-container::-webkit-scrollbar-thumb { background: var(--accent-purple); }
+
+        .mtf-entry {
+            padding: 8px;
+            border-bottom: 1px solid #1a1a1a;
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        /* --- PAGE 3: DOSSIER --- */
+        .dossier-header {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 30px;
+            border: 1px solid var(--accent-purple);
+            padding: 20px;
+        }
+
+        .content-section { margin-bottom: 25px; border-top: 1px solid var(--border); padding-top: 15px; }
+
+        /* --- TYPING ANIMATIONS --- */
+        .t1 { animation: type 1s steps(30) forwards; }
+        .t2 { animation: type 1s steps(30) 1s forwards; }
+        .t3 { animation: type 1s steps(30) 2s forwards; }
+
+        @keyframes type { from { width: 0; } to { width: 100%; } }
     </style>
 </head>
 <body>
 
     <div id="intro-screen">
-        <div class="terminal-text">ESTABLISHING SECURE CONNECTION TO SCIPNET...</div>
-        <div class="terminal-text" style="animation-delay: 3s;">BYPASSING ENCRYPTION LAYERS...</div>
-        <div class="terminal-text" style="animation-delay: 6s;">ACCESS GRANTED. WELCOME, OPERATIVE.</div>
+        <div class="terminal-box">
+            <div class="terminal-line t1">SCiPNet TERMINAL v4.0.1...</div>
+            <div class="terminal-line t2">CONNECTION: SECURE [LEVEL IV]</div>
+            <div class="terminal-line t3" style="color: #fff;">WELCOME, OPERATIVE.</div>
+        </div>
     </div>
 
     <div id="main-panel" class="hidden">
         <div class="header">
-            <h1>SCiPNet FOUNDATIONAL CONTROL PANEL</h1>
-            <div>STATUS: <span style="color: green;">ENCRYPTED</span></div>
+            <h1>FOUNDATIONAL INFORMATION CONTROL</h1>
+            <p style="font-size: 0.8rem; color: var(--accent-purple);">ENCRYPTION: ACTIVE | SYSTEM: STABLE</p>
         </div>
         <div class="grid-container">
             <div class="section-box locked">COMMAND [CL: IV+ | LOCKED]</div>
@@ -190,13 +174,13 @@
             <div class="section-box">INTERNAL DEPARTMENTS</div>
             <div class="section-box">INTELLIGENCE DEPARTMENTS</div>
             <div class="section-box">OFFICE OF NAVAL INTELLIGENCE</div>
-            <div class="section-box clickable" onclick="showPage('mtf-list-page')">>> TASK FORCES [ACCESS OPEN]</div>
+            <div class="section-box clickable" onclick="showPage('mtf-list-page')">[ACCESS] TASK FORCES</div>
         </div>
     </div>
 
     <div id="mtf-list-page" class="hidden">
-        <h2 style="color: var(--accent-red); margin-bottom: 20px;">OPERATIONAL MOBILE TASK FORCES</h2>
-        <div id="mtf-container">
+        <h2 style="color: var(--accent-red); margin-bottom: 10px;">FOUNDATION MTF REGISTRY</h2>
+        <div class="mtf-scroll-container">
             <div class="mtf-entry">MTF █████-█ (“███ █████ ████”)</div>
             <div class="mtf-entry">MTF Alpha-4 (“Pony Express”)</div>
             <div class="mtf-entry">MTF Alpha-9 (“Last Hope”)</div>
@@ -207,117 +191,156 @@
             <div class="mtf-entry">MTF Beta-7 (“Maz Hatters”)</div>
             <div class="mtf-entry">MTF Beta-777 (“Hecate's Spear”)</div>
             <div class="mtf-entry">MTF Gamma-4 (“Blondebeard’s Crew”)</div>
+            <div class="mtf-entry">MTF Gamma-4 (“Green Stags”)</div>
             <div class="mtf-entry">MTF Gamma-5 (“Red Herrings”)</div>
             <div class="mtf-entry">MTF Gamma-6 (“Deep Feeders”)</div>
             <div class="mtf-entry">MTF Gamma-13 (“Asimov's Lawbringers”)</div>
-            <div class="mtf-entry clickable" onclick="triggerXi3Prompt()">MTF Xi-3 (“Body Snatchers”) [CLICK TO DECRYPT]</div>
-            
             <div class="mtf-entry">MTF Gamma-89 ("Rock and a Hard Place")</div>
+            <div class="mtf-entry">MTF Delta-3 (“Solomon's Hand”)</div>
+            <div class="mtf-entry">MTF Delta-4 (“Minutemen”)</div>
+            <div class="mtf-entry">MTF Delta-5 (“Front Runners”)</div>
+            <div class="mtf-entry">MTF Delta-14 (“Winter Wonderland”)</div>
+            <div class="mtf-entry">MTF Delta-45 (“Rolling Thunder”)</div>
+            <div class="mtf-entry">MTF Epsilon-6 (“Village Idiots”)</div>
+            <div class="mtf-entry">MTF Epsilon-7 (“Forget Me Nots”)</div>
+            <div class="mtf-entry">MTF Epsilon-9 (“Fire Eaters”)</div>
             <div class="mtf-entry">MTF Epsilon-11 (“Nine-Tailed Fox”)</div>
+            <div class="mtf-entry">MTF Epsilon-13 (“Manifest Destiny”)</div>
+            <div class="mtf-entry">MTF Epsilon-33 ("Ford Pintos”)</div>
             <div class="mtf-entry">MTF Zeta-9 (“Mole Rats”)</div>
+            <div class="mtf-entry">MTF Eta-4 (“Begone Thoth”)</div>
+            <div class="mtf-entry">MTF Eta-5 (“Jäeger Bombers”)</div>
             <div class="mtf-entry">MTF Eta-10 (“See No Evil”)</div>
+            <div class="mtf-entry">MTF Eta-11 (“Savage Beasts”)</div>
+            <div class="mtf-entry">MTF Eta-13 (“Gulliver's Tourists”)</div>
+            <div class="mtf-entry">MTF Eta-77 (“Spheres Within Spheres”)</div>
+            <div class="mtf-entry">MTF Theta-4 (“Gardeners”)</div>
+            <div class="mtf-entry">MTF Theta-5 (“The Bigger Boat”)</div>
+            <div class="mtf-entry">MTF Theta-90 (“Angle Grinders”)</div>
+            <div class="mtf-entry">MTF Iota-10 (“Damn Feds”)</div>
+            <div class="mtf-entry">MTF Kappa-10 (“Skynet”)</div>
+            <div class="mtf-entry">MTF Kappa-14 (“AH! Sideshow Bob!”)</div>
+            <div class="mtf-entry">MTF Kappa-43 (“The Mediators”)</div>
+            <div class="mtf-entry">MTF Lambda-4 (“Birdwatchers”)</div>
             <div class="mtf-entry">MTF Lambda-5 (“White Rabbits”)</div>
+            <div class="mtf-entry">MTF Lambda-12 (“Pest Control”)</div>
+            <div class="mtf-entry">MTF Lambda-12 (“Kinkshamers”)</div>
+            <div class="mtf-entry">MTF Lambda-14 (“One Star Reviewers”)</div>
+            <div class="mtf-entry">MTF Mu-0 (“Maxwell’s Demons”)</div>
+            <div class="mtf-entry">MTF Mu-3 (“Highest Bidders”)</div>
+            <div class="mtf-entry">MTF Mu-4 (“Debuggers”)</div>
             <div class="mtf-entry">MTF Mu-13 (“Ghostbusters”)</div>
             <div class="mtf-entry">MTF Nu-7 (“Hammer Down”)</div>
+            <div class="mtf-entry">MTF Xi-5 (“Newton's Bullies”)</div>
+            <div class="mtf-entry">MTF Xi-8 (“Last to Fall”)</div>
+            <div class="mtf-entry">MTF Xi-13 (“Sequere Nos”)</div>
+
+            <div class="mtf-entry clickable" onclick="triggerXi3Prompt()">[ACCESS DECRYPTOR] MTF Xi-3 (“Body Snatchers”)</div>
+
+            <div class="mtf-entry">MTF Omicron Rho (“The Dream Team”)</div>
+            <div class="mtf-entry">MTF Pi-1 (“City Slickers”)</div>
+            <div class="mtf-entry">MTF Rho-1 (“The Professors”)</div>
+            <div class="mtf-entry">MTF Rho-9 (“Technical Support”)</div>
+            <div class="mtf-entry">MTF Rho-19 (“Cythereans”)</div>
+            <div class="mtf-entry">MTF ████-█ ("████ ██ █████████████")</div>
+            <div class="mtf-entry">MTF Sigma-3 (“Bibliographers”)</div>
+            <div class="mtf-entry">MTF Sigma-9 (“Valkyries”)</div>
+            <div class="mtf-entry">MTF Sigma-10 (“The Sloth's Arm”)</div>
+            <div class="mtf-entry">MTF Sigma-66 (“Sixteen Tons”)</div>
             <div class="mtf-entry">MTF Tau-5 (“Samsara”)</div>
+            <div class="mtf-entry">MTF Tau-9 (“Bookworms”)</div>
+            <div class="mtf-entry">MTF Tau-51 (“Urban Brawl”)</div>
+            <div class="mtf-entry">MTF Upsilon-4 (“Sugar Pill”)</div>
+            <div class="mtf-entry">MTF Upsilon-11 (“Avalon's Wake”)</div>
+            <div class="mtf-entry">MTF Upsilon-20 (“Hogtown Garrison”)</div>
+            <div class="mtf-entry">MTF Upsilon-23 (“Art Critics”)</div>
+            <div class="mtf-entry">MTF Upsilon-33 ("Rushing Critics")</div>
+            <div class="mtf-entry">MTF Phi-2 (“Clever Girls”)</div>
+            <div class="mtf-entry">MTF Phi-Eolh (“Provident Trawlers”)</div>
+            <div class="mtf-entry">MTF Chi-7 (“Plague Tamers”)</div>
+            <div class="mtf-entry">MTF Chi-9 (“Page Turners”)</div>
+            <div class="mtf-entry">MTF Psi-7 (“Home Improvement”)</div>
+            <div class="mtf-entry">MTF Psi-8 (“The Silencers”)</div>
+            <div class="mtf-entry">MTF Psi-9 (“Abyss Gazers”)</div>
+            <div class="mtf-entry">MTF Psi-13 (“Witch Hunters”)</div>
+            <div class="mtf-entry">MTF Omega-0 (“Ará Orún”)</div>
+            <div class="mtf-entry">MTF Omega-1 (“Law's Left Hand”)</div>
             <div class="mtf-entry">MTF Omega-7 (“Pandora's Box”)</div>
+            <div class="mtf-entry">MTF Omega-9 (“The Scrubs”)</div>
+            <div class="mtf-entry">MTF Omega-12 (“Achilles' Heels”)</div>
+            <div class="mtf-entry">MTF Omega-20 (“Thought Police”)</div>
+            <div class="mtf-entry">MTF Omega-45 (“Street Samurai”)</div>
+            <div class="mtf-entry">MTF Stigma-9 (“Evolved from Naturally Occurring Gears...”)</div>
+            <div class="mtf-entry">MTF Titan-1 (“Off the Books”)</div>
+            <div class="mtf-entry">MTF Alpha-5 (“Paranaughts”)</div>
+            <div class="mtf-entry">MTF Beta-10 ("Time Hoppers")</div>
+            <div class="mtf-entry">MTF Beta-43 ("Con-Trollers")</div>
+            <div class="mtf-entry">MTF Gamma-1 ("Search and Destroy")</div>
+            <div class="mtf-entry">MTF Gamma-44 (“Meat Lockers”)</div>
+            <div class="mtf-entry">MTF Delta-20 ("Blaze It")</div>
+            <div class="mtf-entry">MTF Lambda-9 (“Mind over Matter”)</div>
+            <div class="mtf-entry">MTF Nu-3 (“Limnophobia”)</div>
+            <div class="mtf-entry">MTF Xi-3 (“Body Snatchers”)</div>
+            <div class="mtf-entry">MTF Omicron-12 ("Nine-Tailed Dox")</div>
+            <div class="mtf-entry">MTF Pi-43 (“Garbage In, Garbage Out”)</div>
+            <div class="mtf-entry">MTF Rho-43 (“Home Invaders”)</div>
             <div class="mtf-entry">MTF Sigma-5 (“'; DROP TABLE taskforces —”)</div>
-            <div class="mtf-entry">... [LIST TRUNCATED FOR DISPLAY] ...</div>
+            <div class="mtf-entry">MTF Sigma-66 (“Steel Veil”)</div>
+            <div class="mtf-entry">MTF Tau-22 (“Forest Fires”)</div>
+            <div class="mtf-entry">MTF Psi-10 ("Maslow's Motivators”)</div>
+            <div class="mtf-entry">MTF Psi-18 ("Tenure Trackers”)</div>
+            <div class="mtf-entry">MTF Rēsh-1 (“Seat of Consciousness”)</div>
+            <div class="mtf-entry">MTF Sampi-6 (“Imaginary Numbers”)</div>
+            <div class="mtf-entry">DTF Sigma-6 (“Puddlejumpers”)</div>
+            <div class="mtf-entry">STF Rho-7 (“Greeting Party”)</div>
         </div>
-        <button class="btn" onclick="showPage('main-panel')">BACK TO CONTROL PANEL</button>
+        <div class="clickable" style="display: inline-block;" onclick="showPage('main-panel')">RETURN TO HUB</div>
     </div>
 
-    <div id="modal-overlay" class="hidden">
-        <div class="modal">
-            <h2 style="color: var(--accent-red);">SECURITY ALERT</h2>
-            <p>THIS FILE IS CLEARANCE LEVEL II LOCKED.<br>WOULD YOU LIKE TO PROCEED?</p>
-            <button class="btn" onclick="startLoadingRedirect()">YES</button>
-            <button class="btn" style="background: #333;" onclick="closeModal()">NO</button>
-        </div>
-    </div>
-
-    <div id="xi3-dossier" class="hidden">
+    <div id="xi3-dossier" class="hidden" style="padding: 40px; overflow-y: auto; height: 100vh;">
         <div class="dossier-header">
-            <div class="logo-placeholder">MTF XI-3<br>INSIGNIA<br>PENDING...</div>
-            <div class="info-block">
+            <div style="width:120px; height:120px; border:1px solid #fff; display:flex; align-items:center; text-align:center; font-size:10px;">[IMAGE: LOGO_XI3]</div>
+            <div>
                 <h2>CALLSIGN: XI-3 "BODYSNATCHERS"</h2>
-                <p><strong>DOE:</strong> 03/02/1971</p>
-                <p><strong>OVERSIGHT:</strong> Task Force Commander, "Morpheus"</p>
-                <p><strong>CO-OVERSIGHT:</strong> Deputy Task Force Commander, "Emperyan"</p>
-                <p><strong>SECTION:</strong> SPECIALIZED RECONTAINMENT</p>
-                <p><strong>SUB-SECTION:</strong> ANOMALOUS PERSONNEL</p>
+                <p>DOE: 03/02/1971 | OVERSIGHT: "Morpheus"</p>
+                <p>CO-OVERSIGHT: "Emperyan"</p>
+                <p>SECTION: SPECIALIZED RECONTAINMENT</p>
             </div>
         </div>
-
+        
         <div class="content-section">
-            <h3 style="color: var(--accent-purple);">CREATION (LORE)</h3>
-            <p style="margin-top: 10px; line-height: 1.6;">
-                [REDACTED DATA ENTRY]<br>
-                Task Force Xi-3 was established following the ██████ Incident of 1971. Their primary mandate involves the tracking, acquisition, and neutralization of personnel who have undergone anomalous physiological or psychological displacement.
-            </p>
+            <h3>CREATION (LORE)</h3>
+            <p>[ENTER LORE HERE]</p>
         </div>
 
         <div class="content-section">
-            <h3 style="color: var(--accent-purple);">FOLLOW UP</h3>
-            <p style="margin-top: 10px;">
-                Current status: ACTIVE. Xi-3 currently maintains surveillance on 14 potential "hollow" candidates within Site-19 and Site-17.
-            </p>
+            <h3>FOLLOW UP</h3>
+            <p>[ENTER FOLLOW UP DATA HERE]</p>
         </div>
 
-        <div class="content-section clickable" style="margin-top: 50px; border: 1px dashed var(--accent-red); padding: 20px; text-align: center;" onclick="showActionReport()">
-            ACTION REPORT #001
-        </div>
-    </div>
-
-    <div id="action-report" class="hidden" style="padding: 40px;">
-        <h1 style="color: var(--accent-red); text-align: center;">ACTION REPORT #001</h1>
-        <hr style="border: 1px solid var(--accent-purple); margin: 20px 0;">
-        <div style="max-width: 800px; margin: auto; line-height: 1.8; color: #bbb;">
-            <p><strong>DATE:</strong> ██/██/1972</p>
-            <p><strong>LOCATION:</strong> Site-██</p>
-            <p><strong>SUBJECT:</strong> Recovery of Anomalous Entity 442-A</p>
-            <br>
-            <p>[ENTER ACTION REPORT CONTENT HERE]</p>
-            <br>
-            <button class="btn" onclick="showPage('xi3-dossier')">BACK TO DOSSIER</button>
+        <div class="clickable" style="margin-top: 20px; padding: 15px; text-align: center;" onclick="alert('Accessing Action Report #001...')">
+            [ACCESS] ACTION REPORT #001
         </div>
     </div>
 
     <script>
-        // Intro Sequence
+        // Intro handling
         setTimeout(() => {
             document.getElementById('intro-screen').classList.add('hidden');
             document.getElementById('main-panel').classList.remove('hidden');
-        }, 9000);
+        }, 4000);
 
-        function showPage(pageId) {
-            // Hide all pages
-            const pages = ['main-panel', 'mtf-list-page', 'xi3-dossier', 'action-report'];
-            pages.forEach(id => document.getElementById(id).classList.add('hidden'));
-            // Show target
-            document.getElementById(pageId).classList.remove('hidden');
+        function showPage(p) {
+            document.getElementById('main-panel').classList.add('hidden');
+            document.getElementById('mtf-list-page').classList.add('hidden');
+            document.getElementById('xi3-dossier').classList.add('hidden');
+            document.getElementById(p).classList.remove('hidden');
         }
 
         function triggerXi3Prompt() {
-            document.getElementById('modal-overlay').classList.remove('hidden');
-        }
-
-        function closeModal() {
-            document.getElementById('modal-overlay').classList.add('hidden');
-        }
-
-        function startLoadingRedirect() {
-            const modalContent = document.querySelector('.modal');
-            modalContent.innerHTML = `<h2 style="color: var(--accent-purple);">DECRYPTING...</h2><div class="terminal-text" style="width: 100%;">ACCESSING SCIPNET SECURE SERVER [######____]</div>`;
-            
-            setTimeout(() => {
-                closeModal();
+            if(confirm("THIS FILE IS CLEARANCE LEVEL II LOCKED, WOULD YOU LIKE TO PROCEED?")) {
                 showPage('xi3-dossier');
-            }, 3000);
-        }
-
-        function showActionReport() {
-            showPage('action-report');
+            }
         }
     </script>
 </body>
